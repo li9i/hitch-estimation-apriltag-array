@@ -4,7 +4,7 @@
   <img src="doc/logo.png" style="width: 67%;"/>
 </p>
 
-The `hitch_estimation_apriltag_array` package is intended to estimate the angle between a mobile base and a cart that is hitched to its rear. The calculation is performed by estimating the 6DOF transform between a RGB camera assumed to be mounted at the rear of the mobile base and an array of April tags mounted at the front of the cart.
+The `hitch_estimation_apriltag_array` package is intended to estimate the angle between a mobile base and a cart that is hitched to its rear. The calculation is performed by estimating the 6DOF transform between a rear-facing RGB camera assumed to be mounted at the rear of the mobile base and an array of forward-facing April tags mounted at the front of the cart.
 
 
 ### Parameters
@@ -36,6 +36,6 @@ The utility of this package is to facilitate motion planning and control during 
 [![hitch_estimation_apriltag_array in action](https://img.youtube.com/vi/TSIXd5L-Hxk/0.jpg)](https://www.youtube.com/shorts/TSIXd5L-Hxk)
 
 
-### ROS 2 buildfarm build status 
+### ROS 2 buildfarm build status
 
 [![Build Status](https://build.ros2.org/buildStatus/icon?job=Hsrc_uJ__hitch_estimation_apriltag_array__ubuntu_jammy__source)](https://build.ros2.org/job/Hsrc_uJ__hitch_estimation_apriltag_array__ubuntu_jammy__source/)
