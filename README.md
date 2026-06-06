@@ -4,6 +4,11 @@
   <img src="doc/logo.png" style="width: 67%;"/>
 </p>
 
+<p align="center">
+  <a href="https://build.ros2.org/job/Jdev__hitch_estimation_apriltag_array__ubuntu_noble_amd64/"><img src="https://build.ros2.org/buildStatus/icon?job=Jdev__hitch_estimation_apriltag_array__ubuntu_noble_amd64" alt="Build Status"/></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-BSD_3--Clause-blue.svg" alt="License: BSD 3-Clause"/></a>
+</p>
+
 The `hitch_estimation_apriltag_array` package is intended to estimate the angle between a mobile base and a cart that is hitched to its rear. The calculation is performed by estimating the 6DOF transform between a rear-facing RGB camera assumed to be mounted at the rear of the mobile base and an array of forward-facing April tags mounted at the front of the cart.
 
 
@@ -34,8 +39,3 @@ Instead, if you wish to estimate only the transform of the April tag array with 
 The utility of this package is to facilitate motion planning and control during autonomous navigation of articulated vehicles. See video:
 
 [![hitch_estimation_apriltag_array in action](https://img.youtube.com/vi/TSIXd5L-Hxk/0.jpg)](https://www.youtube.com/shorts/TSIXd5L-Hxk)
-
-
-### ROS 2 buildfarm build status
-
-[![Build Status](https://build.ros2.org/buildStatus/icon?job=Jdev__hitch_estimation_apriltag_array__ubuntu_noble_amd64)](https://build.ros2.org/job/Jdev__hitch_estimation_apriltag_array__ubuntu_noble_amd64/)
