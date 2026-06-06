@@ -38,4 +38,4 @@ The utility of this package is to facilitate motion planning and control during 
 
 ### ROS 2 buildfarm build status
 
-[![Build Status](https://build.ros2.org/buildStatus/icon?job=Hsrc_uJ__hitch_estimation_apriltag_array__ubuntu_jammy__source)](https://build.ros2.org/job/Hsrc_uJ__hitch_estimation_apriltag_array__ubuntu_jammy__source/)
+[![Build Status](https://build.ros2.org/buildStatus/icon?job=Jdev__hitch_estimation_apriltag_array__ubuntu_noble_amd64)](https://build.ros2.org/job/Jdev__hitch_estimation_apriltag_array__ubuntu_noble_amd64/)
