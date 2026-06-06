@@ -5,7 +5,7 @@
 </p>
 
 <p align="center">
-  <a href="https://build.ros2.org/job/Jdev__hitch_estimation_apriltag_array__ubuntu_noble_amd64/"><img src="https://build.ros2.org/buildStatus/icon?job=Jdev__hitch_estimation_apriltag_array__ubuntu_noble_amd64" alt="Build Status"/></a>
+  <a href="https://build.ros2.org/job/Ldev__hitch_estimation_apriltag_array__ubuntu_resolute_amd64/"><img src="https://build.ros2.org/buildStatus/icon?job=Ldev__hitch_estimation_apriltag_array__ubuntu_resolute_amd64" alt="Build Status"/></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-BSD_3--Clause-blue.svg" alt="License: BSD 3-Clause"/></a>
 </p>
 
