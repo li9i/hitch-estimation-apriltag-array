@@ -18,6 +18,7 @@ setup(
         ('share/ament_index/resource_index/packages', ['resource/' + package_name]),
     ],
     install_requires=['setuptools'],
+    tests_require=['pytest'],
     zip_safe=True,
     maintainer='li9i',
     maintainer_email='alexandros.filotheou@gmail.com',
