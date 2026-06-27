@@ -1,20 +1,19 @@
 #!/usr/bin/env python3
 
 import math
-import numpy as np
+
+from geometry_msgs.msg import Point
+from geometry_msgs.msg import PoseStamped
+from geometry_msgs.msg import TransformStamped
 import rclpy
-from rclpy.node import Node
 from rclpy.duration import Duration
+from rclpy.node import Node
 from sensor_msgs.msg import Imu
 from sensor_msgs.msg import JointState
-from geometry_msgs.msg import TransformStamped
-from geometry_msgs.msg import PoseStamped
-from geometry_msgs.msg import Point
-from tf2_ros import TransformListener
 from tf2_ros import Buffer
 from tf2_ros import TransformBroadcaster
+from tf2_ros import TransformListener
 from tf_transformations import euler_from_quaternion
-from tf_transformations import quaternion_from_matrix
 from tf_transformations import quaternion_from_euler
 from tf_transformations import quaternion_matrix
 
@@ -107,13 +106,13 @@ class MobileBaseTrailerHitchJointStatePublisher(Node):
             3. Extract roll, pitch, yaw from the AprilTag orientation.
             4. Apply a fixed yaw adjustment to align frames.
 
-        Returns:
-            tuple:
-                (imu_roll, imu_pitch, imu_yaw,
-                 at_roll, at_pitch, at_yaw)
-
+        Returns
+        -------
+        tuple
+            (imu_roll, imu_pitch, imu_yaw, at_roll, at_pitch, at_yaw).
             If TF lookup fails, returns zeros and publishes the last known
             joint state.
+
         """
         # Extract roll/pitch/yaw from IMU
         q1 = self.mobile_base_imu_data.orientation
@@ -128,11 +127,6 @@ class MobileBaseTrailerHitchJointStatePublisher(Node):
                 rclpy.time.Time(),
                 timeout=Duration(seconds=0.5)
             )
-            p0 = [
-                transform.transform.translation.x,
-                transform.transform.translation.y,
-                transform.transform.translation.z
-            ]
             q0 = [
                 transform.transform.rotation.x,
                 transform.transform.rotation.y,
@@ -141,7 +135,7 @@ class MobileBaseTrailerHitchJointStatePublisher(Node):
             ]
         except Exception as e:
             self.get_logger().error(
-                f"Failed to lookup apriltags transform: {str(e)}"
+                f'Failed to lookup apriltags transform: {str(e)}'
             )
             self.hitch_joint_state.header.stamp = self.get_clock().now().to_msg()
             self.joint_state_pub.publish(self.hitch_joint_state)
@@ -149,10 +143,10 @@ class MobileBaseTrailerHitchJointStatePublisher(Node):
 
         r, p, y = euler_from_quaternion(q0)
         self.get_logger().debug(
-            "g_base2apriltag: "
-            f"rpy=({math.degrees(r):.1f}°, "
-            f"{math.degrees(p):.1f}°, "
-            f"{math.degrees(y):.1f}°)"
+            'g_base2apriltag: '
+            f'rpy=({math.degrees(r):.1f}°, '
+            f'{math.degrees(p):.1f}°, '
+            f'{math.degrees(y):.1f}°)'
         )
 
         at_roll, at_pitch, at_yaw = euler_from_quaternion(q0)
@@ -163,28 +157,29 @@ class MobileBaseTrailerHitchJointStatePublisher(Node):
         return imu_roll, imu_pitch, imu_yaw, at_roll, at_pitch, at_yaw
 
     def display_hitch_joint_state_callback(self):
-        """
-        Periodically log the trailer hitch yaw angle to the console.
-        """
+        """Periodically log the trailer hitch yaw angle to the console."""
         if self.hitch_joint_state.position:
             yaw_deg = self.hitch_joint_state.position[0] * 180 / math.pi
             self.get_logger().info(
-                f"Trailer hitch angle (deg): {yaw_deg:+.2f}"
+                f'Trailer hitch angle (deg): {yaw_deg:+.2f}'
             )
 
     def from_translation_rotation(self, p, q):
         """
         Construct a homogeneous transform from translation and rotation.
 
-        Args:
-            p (list[float]):
-                Translation [x, y, z].
-            q (list[float]):
-                Quaternion [x, y, z, w].
+        Parameters
+        ----------
+        p : list[float]
+            Translation [x, y, z].
+        q : list[float]
+            Quaternion [x, y, z, w].
 
-        Returns:
-            np.ndarray:
-                4x4 homogeneous transformation matrix.
+        Returns
+        -------
+        np.ndarray
+            4x4 homogeneous transformation matrix.
+
         """
         matrix = quaternion_matrix(q)
         matrix[0:3, 3] = p
@@ -229,9 +224,7 @@ class MobileBaseTrailerHitchJointStatePublisher(Node):
             self.publish_joint_transform_to_tf(fall_back)
 
     def init_params(self):
-        """
-        Declare and retrieve ROS parameters used by this node.
-        """
+        """Declare and retrieve ROS parameters used by this node."""
         self.declare_parameters(
             namespace='',
             parameters=[
@@ -255,7 +248,8 @@ class MobileBaseTrailerHitchJointStatePublisher(Node):
         self.mobile_base_imu_topic = self.get_parameter('mobile_base_imu_topic').value
         self.joint_states_topic = self.get_parameter('joint_states_topic').value
         self.camera_frame = self.get_parameter('camera_frame').value
-        self.apriltag_array_optical_frame = self.get_parameter('apriltag_array_optical_frame').value
+        self.apriltag_array_optical_frame = self.get_parameter(
+            'apriltag_array_optical_frame').value
         self.mobile_base_hitch_joint = self.get_parameter('mobile_base_hitch_joint').value
         self.trailer_hitch_joint = self.get_parameter('trailer_hitch_joint').value
         self.publish_joint_states = self.get_parameter('publish_joint_states').value
@@ -265,9 +259,11 @@ class MobileBaseTrailerHitchJointStatePublisher(Node):
         """
         Store the most recent IMU message from the mobile base.
 
-        Args:
-            data (sensor_msgs.msg.Imu):
-                Incoming IMU message.
+        Parameters
+        ----------
+        data : sensor_msgs.msg.Imu
+            Incoming IMU message.
+
         """
         self.mobile_base_imu_data = data
 
@@ -275,9 +271,11 @@ class MobileBaseTrailerHitchJointStatePublisher(Node):
         """
         Publish the hitch joint as a TF transform.
 
-        Args:
-            fall_back (bool):
-                If True, reuse the previously published joint state.
+        Parameters
+        ----------
+        fall_back : bool
+            If True, reuse the previously published joint state.
+
         """
         joint_names = self.hitch_joint_state.name
 
@@ -315,9 +313,11 @@ class MobileBaseTrailerHitchJointStatePublisher(Node):
         """
         Publish the hitch joint state to a JointState topic.
 
-        Args:
-            fall_back (bool):
-                If True, publish the previously known joint state.
+        Parameters
+        ----------
+        fall_back : bool
+            If True, publish the previously known joint state.
+
         """
         if fall_back and self.prev_hitch_joint_state:
             self.joint_state_pub.publish(self.prev_hitch_joint_state)
@@ -326,11 +326,13 @@ class MobileBaseTrailerHitchJointStatePublisher(Node):
 
     def transform_cb(self, data):
         """
-        Callback for incoming camera-to-AprilTag transforms.
+        Handle an incoming camera-to-AprilTag transform.
 
-        Args:
-            data (TransformStamped):
-                Transform from camera frame to AprilTag array frame.
+        Parameters
+        ----------
+        data : TransformStamped
+            Transform from camera frame to AprilTag array frame.
+
         """
         self.transform = data
         self.pose0 = self.transformStamped_to_poseStamped(self.transform)
@@ -339,13 +341,16 @@ class MobileBaseTrailerHitchJointStatePublisher(Node):
         """
         Convert a TransformStamped message into a PoseStamped message.
 
-        Args:
-            msg_in (TransformStamped):
-                Input transform message.
+        Parameters
+        ----------
+        msg_in : TransformStamped
+            Input transform message.
 
-        Returns:
-            PoseStamped:
-                Equivalent pose representation.
+        Returns
+        -------
+        PoseStamped
+            Equivalent pose representation.
+
         """
         msg_out = PoseStamped()
         msg_out.header = msg_in.header
@@ -359,9 +364,7 @@ class MobileBaseTrailerHitchJointStatePublisher(Node):
 
 
 def main(args=None):
-    """
-    Entry point for the MobileBaseTrailerHitchJointStatePublisher node.
-    """
+    """Entry point for the MobileBaseTrailerHitchJointStatePublisher node."""
     rclpy.init(args=args)
     node = MobileBaseTrailerHitchJointStatePublisher()
     rclpy.spin(node)

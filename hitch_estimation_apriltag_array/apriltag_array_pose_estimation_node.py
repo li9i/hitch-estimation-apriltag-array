@@ -1,17 +1,16 @@
 import math
+
+from apriltag_msgs.msg import AprilTagDetectionArray
+from geometry_msgs.msg import TransformStamped
 import numpy as np
 import rclpy
 from rclpy.node import Node
-from rclpy.duration import Duration
-from tf2_ros import TransformBroadcaster
-from tf2_ros.static_transform_broadcaster import StaticTransformBroadcaster
 from tf2_ros import Buffer
-from tf2_ros import TransformListener
-from tf2_ros import LookupException
 from tf2_ros import ConnectivityException
 from tf2_ros import ExtrapolationException
-from apriltag_msgs.msg import AprilTagDetectionArray
-from geometry_msgs.msg import TransformStamped
+from tf2_ros import LookupException
+from tf2_ros import TransformBroadcaster
+from tf2_ros import TransformListener
 import tf_transformations
 
 
@@ -51,8 +50,12 @@ class AprilTagArrayPoseEstimation(Node):
 
         self.declare_parameter('detection_topic', '/robot/rear_rgb_camera/apriltag_ros/detections')
         self.declare_parameter('camera_frame', 'robot_rear_color_optical_frame')
-        self.declare_parameter('apriltag_array_optical_frame', 'robot_cart_apriltag_array_optical_link')
-        self.declare_parameter('camera_to_array_pose_topic', '/robot/rear_rgb_camera/apriltag_plane/transform')
+        self.declare_parameter(
+            'apriltag_array_optical_frame',
+            'robot_cart_apriltag_array_optical_link')
+        self.declare_parameter(
+            'camera_to_array_pose_topic',
+            '/robot/rear_rgb_camera/apriltag_plane/transform')
         self.declare_parameter('publish_rate', 30.0)
         self.declare_parameter('publish_to_topic', True)
         self.declare_parameter('publish_to_tf', True)
@@ -97,13 +100,16 @@ class AprilTagArrayPoseEstimation(Node):
         Uses the eigenvector method to compute a statistically meaningful
         average rotation.
 
-        Args:
-            quats (list[np.ndarray]):
-                List of quaternions in (x, y, z, w) format.
+        Parameters
+        ----------
+        quats : list[np.ndarray]
+            List of quaternions in (x, y, z, w) format.
 
-        Returns:
-            np.ndarray:
-                Averaged quaternion (x, y, z, w).
+        Returns
+        -------
+        np.ndarray
+            Averaged quaternion (x, y, z, w).
+
         """
         A = np.zeros((4, 4))
         for q in quats:
@@ -120,10 +126,12 @@ class AprilTagArrayPoseEstimation(Node):
         Looks up TF transforms from the camera frame to each detected AprilTag
         frame, then averages their positions and orientations.
 
-        Returns:
-            tuple[np.ndarray, np.ndarray] or None:
-                (avg_position, avg_quaternion) if successful,
-                None if no valid transforms are available.
+        Returns
+        -------
+        tuple[np.ndarray, np.ndarray] or None
+            (avg_position, avg_quaternion) if successful,
+            None if no valid transforms are available.
+
         """
         if not self.detected_ids:
             return None
@@ -159,16 +167,18 @@ class AprilTagArrayPoseEstimation(Node):
 
     def on_detections(self, msg):
         """
-        Callback for AprilTag detection messages.
+        Handle an incoming AprilTag detection message.
 
         Extracts detected tag frame names from the message and stores them
         for later TF lookup.
 
-        Args:
-            msg (AprilTagDetectionArray):
-                Incoming detection message from apriltag_ros.
+        Parameters
+        ----------
+        msg : AprilTagDetectionArray
+            Incoming detection message from apriltag_ros.
+
         """
-        self.detected_ids = [f"{d.family}:{d.id}" for d in msg.detections]
+        self.detected_ids = [f'{d.family}:{d.id}' for d in msg.detections]
 
     def process_and_publish(self):
         """
@@ -238,40 +248,45 @@ class AprilTagArrayPoseEstimation(Node):
         """
         Store the camera-to-array transform internally as a 4x4 matrix.
 
-        Args:
-            avg_p (np.ndarray):
-                Averaged translation vector (x, y, z).
-            avg_q (np.ndarray):
-                Averaged orientation quaternion (x, y, z, w).
+        Parameters
+        ----------
+        avg_p : np.ndarray
+            Averaged translation vector (x, y, z).
+        avg_q : np.ndarray
+            Averaged orientation quaternion (x, y, z, w).
+
         """
         self.T_camera_to_optical = tf_transformations.quaternion_matrix(avg_q)
         self.T_camera_to_optical[0:3, 3] = avg_p
 
         r, p, y = tf_transformations.euler_from_quaternion(avg_q)
         self.get_logger().debug(
-            f"camera_to_optical: pos=({avg_p[0]:.3f},{avg_p[1]:.3f},{avg_p[2]:.3f}), "
-            f"rpy=({math.degrees(r):.1f}°, {math.degrees(p):.1f}°, {math.degrees(y):.1f}°)"
+            f'camera_to_optical: pos=({avg_p[0]:.3f},{avg_p[1]:.3f},{avg_p[2]:.3f}), '
+            f'rpy=({math.degrees(r):.1f}°, {math.degrees(p):.1f}°, {math.degrees(y):.1f}°)'
         )
 
     def transform_stamped_msg(self, stamp, frame_id, child_frame_id, translation, rotation):
         """
-        Helper function to construct a TransformStamped message.
+        Construct a TransformStamped message.
 
-        Args:
-            stamp (builtin_interfaces.msg.Time):
-                Timestamp for the transform.
-            frame_id (str):
-                Parent frame ID.
-            child_frame_id (str):
-                Child frame ID.
-            translation (array-like):
-                Translation vector (x, y, z).
-            rotation (array-like):
-                Quaternion (x, y, z, w).
+        Parameters
+        ----------
+        stamp : builtin_interfaces.msg.Time
+            Timestamp for the transform.
+        frame_id : str
+            Parent frame ID.
+        child_frame_id : str
+            Child frame ID.
+        translation : array-like
+            Translation vector (x, y, z).
+        rotation : array-like
+            Quaternion (x, y, z, w).
 
-        Returns:
-            TransformStamped:
-                Populated transform message.
+        Returns
+        -------
+        TransformStamped
+            Populated transform message.
+
         """
         t = TransformStamped()
         t.header.stamp = stamp
@@ -288,9 +303,7 @@ class AprilTagArrayPoseEstimation(Node):
 
 
 def main():
-    """
-    Entry point for the AprilTagArrayPoseEstimation node.
-    """
+    """Entry point for the AprilTagArrayPoseEstimation node."""
     rclpy.init()
     node = AprilTagArrayPoseEstimation()
     rclpy.spin(node)
